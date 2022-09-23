@@ -1697,7 +1697,7 @@ aus_exports</code></pre>
    \frac14y_{t}+\frac14y_{t+1}+\frac18y_{t+2}
 \]</span></p>
 <p>Thanks to this process, we have turned an even ordered moving average (the initial 4 points moving average) into a symmetric moving average that has the same number of points to the left and to the right of the point at which the MA is computed (<span class="math inline">\(t\)</span>). In this case, this has enabled us to compute a centered moving average of quarterly data. Note how the sum of all the 5 coefficients is 1, so that it can be interpreted as a <em>weighted moving average</em> (see next point).</p>
-<p><strong>The genal rule is that to center an even-numbered moving average, we need to take a second subsequent moving average of uneven order</strong>. In this case the notation <strong>“2 x 4-MA”</strong> means that <em>a 4-MA is followed by a 2-MA</em>.</p>
+<p><strong>The genal rule is that to center an even-numbered moving average, we need to take a second subsequent moving average of even order</strong>. In this case the notation <strong>“2 x 4-MA”</strong> means that <em>a 4-MA is followed by a 2-MA</em>.</p>
 <p>The code to compute such a moving average would look like this:</p>
 <pre class="r"><code>beer &lt;- aus_production %&gt;%
   filter(year(Quarter) &gt;= 1992) %&gt;%
@@ -1800,18 +1800,132 @@ us_retail_employment_ma %&gt;%
 <div id="exercise-1" class="section level1">
 <h1>Exercise 1</h1>
 <ol style="list-style-type: decimal">
-<li>Take the dataset <code>vic_elec</code> and aggregate the data to obtain the daily demand using <code>index_by()</code>. Then compute a 7-MA of the resulting series.</li>
+<li>Take the dataset <code>vic_elec</code> and aggregate the data to obtain the mean daily demand using <code>index_by()</code>. Then compute a 7-MA of the resulting series (meaning taking one week).</li>
 </ol>
+<pre class="r"><code>d_elec &lt;- vic_elec %&gt;% 
+            index_by(as_date(Time)) %&gt;% 
+            summarise(
+              d_demand = mean(Demand)
+            )
+
+d_elec</code></pre>
+<pre><code>## # A tsibble: 1,096 x 2 [1D]
+##    `as_date(Time)` d_demand
+##    &lt;date&gt;             &lt;dbl&gt;
+##  1 2012-01-01         4634.
+##  2 2012-01-02         5374.
+##  3 2012-01-03         5565.
+##  4 2012-01-04         4640.
+##  5 2012-01-05         4387.
+##  6 2012-01-06         4380.
+##  7 2012-01-07         4219.
+##  8 2012-01-08         4029.
+##  9 2012-01-09         4454.
+## 10 2012-01-10         4480.
+## # ... with 1,086 more rows</code></pre>
+<pre class="r"><code>d_elec &lt;- d_elec %&gt;%
+  mutate(
+    `7-MA` = slider::slide_dbl(d_demand, mean,
+                .before = 3, .after = 3, .complete = TRUE)
+  )
+
+d_elec</code></pre>
+<pre><code>## # A tsibble: 1,096 x 3 [1D]
+##    `as_date(Time)` d_demand `7-MA`
+##    &lt;date&gt;             &lt;dbl&gt;  &lt;dbl&gt;
+##  1 2012-01-01         4634.    NA 
+##  2 2012-01-02         5374.    NA 
+##  3 2012-01-03         5565.    NA 
+##  4 2012-01-04         4640.  4743.
+##  5 2012-01-05         4387.  4656.
+##  6 2012-01-06         4380.  4525.
+##  7 2012-01-07         4219.  4370.
+##  8 2012-01-08         4029.  4354.
+##  9 2012-01-09         4454.  4378.
+## 10 2012-01-10         4480.  4395.
+## # ... with 1,086 more rows</code></pre>
 </div>
 <div id="exercise-2" class="section level1">
 <h1>Exercise 2</h1>
 <ol start="2" style="list-style-type: decimal">
-<li>Take the dataset <code>vic_elec</code> and aggregate the data to obtain the peak quarterly demand using <code>index_by()</code>. Then compute a 2x4-MA of the resulting series that is centered.</li>
+<li>Take the dataset <code>vic_elec</code> and aggregate the data to obtain the mean quarterly demand using <code>index_by()</code>. Then compute a 2x4-MA of the resulting series that is centered.</li>
 </ol>
+<pre class="r"><code>q_elec &lt;- vic_elec %&gt;% 
+            index_by(yearquarter(Time)) %&gt;% 
+            summarise(
+              q_demand = mean(Demand)
+            )
+
+q_elec</code></pre>
+<pre><code>## # A tsibble: 12 x 2 [1Q]
+##    `yearquarter(Time)` q_demand
+##                  &lt;qtr&gt;    &lt;dbl&gt;
+##  1             2012 Q1    4776.
+##  2             2012 Q2    4843.
+##  3             2012 Q3    4898.
+##  4             2012 Q4    4430.
+##  5             2013 Q1    4780.
+##  6             2013 Q2    4728.
+##  7             2013 Q3    4731.
+##  8             2013 Q4    4364.
+##  9             2014 Q1    4676.
+## 10             2014 Q2    4577.
+## 11             2014 Q3    4835.
+## 12             2014 Q4    4352.</code></pre>
+<pre class="r"><code>q_elec &lt;- q_elec %&gt;%
+  mutate(
+    `4-MA` = slider::slide_dbl(q_demand, mean,
+                .before = 2, .after = 1, .complete = TRUE),
+    `2x4-MA` = slider::slide_dbl(`4-MA`, mean,
+                .before = 0, .after = 1, .complete = TRUE)
+  )
+
+q_elec</code></pre>
+<pre><code>## # A tsibble: 12 x 4 [1Q]
+##    `yearquarter(Time)` q_demand `4-MA` `2x4-MA`
+##                  &lt;qtr&gt;    &lt;dbl&gt;  &lt;dbl&gt;    &lt;dbl&gt;
+##  1             2012 Q1    4776.    NA       NA 
+##  2             2012 Q2    4843.    NA       NA 
+##  3             2012 Q3    4898.  4737.    4737.
+##  4             2012 Q4    4430.  4738.    4723.
+##  5             2013 Q1    4780.  4709.    4688.
+##  6             2013 Q2    4728.  4667.    4659.
+##  7             2013 Q3    4731.  4651.    4638.
+##  8             2013 Q4    4364.  4625.    4606.
+##  9             2014 Q1    4676.  4587.    4600.
+## 10             2014 Q2    4577.  4613.    4612.
+## 11             2014 Q3    4835.  4610.      NA 
+## 12             2014 Q4    4352.    NA       NA</code></pre>
+<pre class="r"><code># Check that you can produce the same result inverting the order of before-after
+# The output of the final time series 2x12 MA is the same
+q_elec &lt;- q_elec %&gt;%
+  mutate(
+    `4-MA` = slider::slide_dbl(q_demand, mean,
+                .before = 1, .after = 2, .complete = TRUE),
+    `2x4-MA` = slider::slide_dbl(`4-MA`, mean,
+                .before = 1, .after = 0, .complete = TRUE)
+  )
+
+q_elec</code></pre>
+<pre><code>## # A tsibble: 12 x 4 [1Q]
+##    `yearquarter(Time)` q_demand `4-MA` `2x4-MA`
+##                  &lt;qtr&gt;    &lt;dbl&gt;  &lt;dbl&gt;    &lt;dbl&gt;
+##  1             2012 Q1    4776.    NA       NA 
+##  2             2012 Q2    4843.  4737.      NA 
+##  3             2012 Q3    4898.  4738.    4737.
+##  4             2012 Q4    4430.  4709.    4723.
+##  5             2013 Q1    4780.  4667.    4688.
+##  6             2013 Q2    4728.  4651.    4659.
+##  7             2013 Q3    4731.  4625.    4638.
+##  8             2013 Q4    4364.  4587.    4606.
+##  9             2014 Q1    4676.  4613.    4600.
+## 10             2014 Q2    4577.  4610.    4612.
+## 11             2014 Q3    4835.    NA       NA 
+## 12             2014 Q4    4352.    NA       NA</code></pre>
 </div>
 <div id="exercise-3" class="section level1">
 <h1>Exercise 3</h1>
-<p>Obtain the formula for a</p>
+<p>Obtain the formula for a:</p>
 <ol style="list-style-type: decimal">
 <li><strong>2 x 12-MA</strong></li>
 <li><strong>3 x 5-MA</strong></li>
