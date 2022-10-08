@@ -1685,14 +1685,14 @@ aus_retail %&gt;%
 ## 10 Australian Capital Territory Cafes, restaurants and~ A33498~ 2018 Oct    41.7
 ## # ... with 1,814 more rows, and abbreviated variable names 1: `Series ID`,
 ## #   2: Turnover</code></pre>
-<p>The next one is a bit tricky and involves these operation precedence issue. First look at the following decreasing sequence</p>
+<p>The next one is a bit tricky and involves this operation precedence issue. First look at the following decreasing sequence</p>
 <pre class="r"><code>19:0</code></pre>
 <pre><code>##  [1] 19 18 17 16 15 14 13 12 11 10  9  8  7  6  5  4  3  2  1  0</code></pre>
 <p>Adding or subtracting an integer to that sequence does not alter the number of elements, rather, it only shifts the sequence accordingly</p>
 <pre class="r"><code>200 - 19:0</code></pre>
 <pre><code>##  [1] 181 182 183 184 185 186 187 188 189 190 191 192 193 194 195 196 197 198 199
 ## [20] 200</code></pre>
-<p>Using this, we can use the integer returned by <code>n()</code> when used within <code>dplyr</code> verbs, the number of rows, to obtain only the last 20 observations in the dataset:</p>
+<p>Using this, we can use the integer returned by <code>n()</code> when used within <code>dplyr</code> verbs (the number of rows) to obtain only the last 20 observations in the dataset:</p>
 <pre class="r"><code># Extract the latest 20 observations (20 quarters -&gt; 5 years)
 aus_production %&gt;%
   slice(n()-19:0)</code></pre>
@@ -2481,7 +2481,7 @@ google_2015_fc_cv</code></pre>
   ggplot(aes(x = h, y = RMSE, color = .model)) +
   geom_point()</code></pre>
 <p><img src="data:image/png;base64,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" width="672" /></p>
-<p>As you can see the graph indicates that the average performance of the drift model over all the train-test splits and forecast horizons is much better than that of the mean method for this particular time series.</p>
+<p>As you can see the graph indicates that the average performance of the drift model over all the train-test splits is much better than that of the mean method for this particular time series for all the forecast horizons analyzed.</p>
 </div>
 <div id="generate-average-accuracy-metrics-over-all-the-forecasting-horizons." class="section level4">
 <h4>4.2 Generate average accuracy metrics over all the forecasting horizons.</h4>
@@ -2543,16 +2543,205 @@ beer_production</code></pre>
 ## # ... with 64 more rows</code></pre>
 </div>
 <div id="step-1.-create-the-set-of-training-datasets-using-stretch_tsibble-1" class="section level3">
-<h3>Step 1. Create the set of training datasets using <code>stretch_tsibble()</code></h3>
+<h3>Step 1. Create the set of training datasets using <code>stretch_tsibble()</code>:</h3>
+<ul>
+<li>Since we are going to forecast up to 8-steps ahead into the future, the minimum size of our training datasets must be eight. We therefore set <code>.init</code> to 8.</li>
+<li>We want our training datasets to increase one data point at a time, so we set <code>.step</code> to 1. For complex models that take longer to fit, it may be impractical to have so many datasets and we may want to have a bigger step. Remember that a model will be fitted to each of your datasets, si if fitting your models is computationally expensive, you may not be interested in having so many datasets. For this example, since the models are simple enough, we may set step to 1.</li>
+</ul>
+<pre class="r"><code>beer_production_cv &lt;- beer_production %&gt;%
+  stretch_tsibble(.init = 8, .step = 1)
+
+# Inspect result
+beer_production_cv</code></pre>
+<pre><code>## # A tsibble: 2,747 x 3 [1Q]
+## # Key:       .id [67]
+##    Quarter  Beer   .id
+##      &lt;qtr&gt; &lt;dbl&gt; &lt;int&gt;
+##  1 1992 Q1   443     1
+##  2 1992 Q2   410     1
+##  3 1992 Q3   420     1
+##  4 1992 Q4   532     1
+##  5 1993 Q1   433     1
+##  6 1993 Q2   421     1
+##  7 1993 Q3   410     1
+##  8 1993 Q4   512     1
+##  9 1992 Q1   443     2
+## 10 1992 Q2   410     2
+## # ... with 2,737 more rows</code></pre>
+<div id="inspection-of-result-of-step-1" class="section level4">
+<h4>Inspection of result of step 1:</h4>
+<p>Inspecting <code>beer_production_cv</code> shows that it is a tsibble containing all our training datasets. Each training dataset has a distinct identifier in the column <code>.id</code>. Rows with <code>.id = 1</code> belong to the first training dataset, <code>id = 2</code> signals points belonging to the second dataset… etc… The number of datasets can be computed as follows:</p>
+<pre class="r"><code># Check the number of datasets created
+beer_production_cv %&gt;% pull(.id) %&gt;% max</code></pre>
+<pre><code>## [1] 67</code></pre>
+<p>We see that 67 training datasets were created. Each training dataset consists of multiple observations, ranging from 8 (first training dataset) to 74 observations (last dataset). The number of points per dataset can be inspected either counting rows in <code>beer_production_cv</code> (not very practical) or computing the size of the groups created by group_by(.id) as follows:</p>
+<pre class="r"><code># Check the size of each training dataset
+beer_production_cv %&gt;%
+  as_tibble() %&gt;% # Cast to a tibble to be able to do away with time index
+  group_by(.id) %&gt;%
+  summarize(
+    size = n()
+  )</code></pre>
+<pre><code>## # A tibble: 67 x 2
+##      .id  size
+##    &lt;int&gt; &lt;int&gt;
+##  1     1     8
+##  2     2     9
+##  3     3    10
+##  4     4    11
+##  5     5    12
+##  6     6    13
+##  7     7    14
+##  8     8    15
+##  9     9    16
+## 10    10    17
+## # ... with 57 more rows</code></pre>
+</div>
 </div>
 <div id="step-2-fit-the-models" class="section level3">
 <h3>Step 2: Fit the models</h3>
+<p>Fit the models. In this case we chose to fit the four benchmark methods. More complex models might be fitted, but the workflow is the same:</p>
+<pre class="r"><code>beer_fit_cv &lt;- beer_production_cv %&gt;%
+  model(
+    `Naïve` = NAIVE(Beer),
+    `Seasonal naïve` = SNAIVE(Beer),
+    Mean = MEAN(Beer),
+    Drift = RW(Beer ~ drift())
+  )
+
+beer_fit_cv</code></pre>
+<pre><code>## # A mable: 67 x 5
+## # Key:     .id [67]
+##      .id   Naïve `Seasonal naïve`    Mean         Drift
+##    &lt;int&gt; &lt;model&gt;          &lt;model&gt; &lt;model&gt;       &lt;model&gt;
+##  1     1 &lt;NAIVE&gt;         &lt;SNAIVE&gt;  &lt;MEAN&gt; &lt;RW w/ drift&gt;
+##  2     2 &lt;NAIVE&gt;         &lt;SNAIVE&gt;  &lt;MEAN&gt; &lt;RW w/ drift&gt;
+##  3     3 &lt;NAIVE&gt;         &lt;SNAIVE&gt;  &lt;MEAN&gt; &lt;RW w/ drift&gt;
+##  4     4 &lt;NAIVE&gt;         &lt;SNAIVE&gt;  &lt;MEAN&gt; &lt;RW w/ drift&gt;
+##  5     5 &lt;NAIVE&gt;         &lt;SNAIVE&gt;  &lt;MEAN&gt; &lt;RW w/ drift&gt;
+##  6     6 &lt;NAIVE&gt;         &lt;SNAIVE&gt;  &lt;MEAN&gt; &lt;RW w/ drift&gt;
+##  7     7 &lt;NAIVE&gt;         &lt;SNAIVE&gt;  &lt;MEAN&gt; &lt;RW w/ drift&gt;
+##  8     8 &lt;NAIVE&gt;         &lt;SNAIVE&gt;  &lt;MEAN&gt; &lt;RW w/ drift&gt;
+##  9     9 &lt;NAIVE&gt;         &lt;SNAIVE&gt;  &lt;MEAN&gt; &lt;RW w/ drift&gt;
+## 10    10 &lt;NAIVE&gt;         &lt;SNAIVE&gt;  &lt;MEAN&gt; &lt;RW w/ drift&gt;
+## # ... with 57 more rows</code></pre>
+<div id="inspection-of-result-of-step-2" class="section level4">
+<h4>Inspection of result of step 2:</h4>
+<p>The result of step 2 is a <code>mable</code> of <code>model talbe</code>. It is essentially a table-shaped object containing all the models that have been fit. Let us inspect its dimensions:</p>
+<pre class="r"><code>dim(beer_fit_cv)</code></pre>
+<pre><code>## [1] 67  5</code></pre>
+<p>We see that it has 67 rows (one row per training dataset) and 5 columns: 1 for <code>.id</code> (identifier of the training dataset) and one column per model.
+* 4 models have been fit to each training dataset.
+* In total 4*67 = 268 models have been fit.</p>
 </div>
-<div id="step-3-generate-the-forecasts" class="section level3">
-<h3>Step 3: generate the forecasts</h3>
+</div>
+<div id="step-3.1-generate-the-forecasts" class="section level3">
+<h3>Step 3.1: generate the forecasts:</h3>
+<pre class="r"><code>beer_fc_cv &lt;- beer_fit_cv %&gt;%
+  forecast(h = 8)
+
+beer_fc_cv</code></pre>
+<pre><code>## # A fable: 2,144 x 5 [1Q]
+## # Key:     .id, .model [268]
+##      .id .model         Quarter          Beer .mean
+##    &lt;int&gt; &lt;chr&gt;            &lt;qtr&gt;        &lt;dist&gt; &lt;dbl&gt;
+##  1     1 Naïve          1994 Q1  N(512, 4886)   512
+##  2     1 Naïve          1994 Q2  N(512, 9772)   512
+##  3     1 Naïve          1994 Q3 N(512, 14658)   512
+##  4     1 Naïve          1994 Q4 N(512, 19545)   512
+##  5     1 Naïve          1995 Q1 N(512, 24431)   512
+##  6     1 Naïve          1995 Q2 N(512, 29317)   512
+##  7     1 Naïve          1995 Q3 N(512, 34203)   512
+##  8     1 Naïve          1995 Q4 N(512, 39089)   512
+##  9     1 Seasonal naïve 1994 Q1   N(433, 180)   433
+## 10     1 Seasonal naïve 1994 Q2   N(421, 180)   421
+## # ... with 2,134 more rows</code></pre>
+<div id="inspection-of-result-of-step-3.1" class="section level4">
+<h4>Inspection of result of step 3.1:</h4>
+<p>The output of step three is a <code>fable</code> or <code>forecasts table</code>.</p>
+<ul>
+<li>Each row corresponds to a specific forecast horizon, with a given model fit to a specific training dataset signaled by the row <code>.id</code></li>
+<li>For each compination of training dataset (<code>.id</code>) and <code>.model</code>, 8 forecast have been generated, ranging from a one-step ahead to an 8-steps ahead forecast.</li>
+<li>In total we have generated 67 (67 training datasets) * 4 (4 models) * 8 (8 forecasts) = 2144 forecasts. We can confirm this counting the nomber of roews of the result of step 3:</li>
+</ul>
+<pre class="r"><code>nrow(beer_fit_cv)</code></pre>
+<pre><code>## [1] 67</code></pre>
+</div>
+</div>
+<div id="step-3.2-only-for-multti-step-forecasts" class="section level3">
+<h3>Step 3.2: (only for multti-step forecasts)</h3>
+<p>Since we have multi-step forecasts, we want to add a column to the forecasts table that indicates the forecast horizon (h) of each forecast. We can achieve this using group_by.</p>
+<ul>
+<li>We want h to be reset every time the training dataset or the model changes, so we will group_by(.id, .model)</li>
+<li>as_fable() is used at the end to ensure that after performing a group_by and creating a new column, the result will still be a forecast table.
+<ul>
+<li><code>response</code> indicates the variable we are forecasting</li>
+<li><code>distribution</code> indicates were the column storing the forecast distributions of each forecast. The name is set to be the same as in the original output of step 3.1.</li>
+</ul></li>
+</ul>
+<pre class="r"><code>beer_fc_cv &lt;- beer_fc_cv %&gt;%
+  group_by(.id, .model) %&gt;%
+  mutate(h = row_number()) %&gt;%
+  ungroup() %&gt;%
+  as_fable(response = &quot;Beer&quot;, distribution = Beer)
+
+beer_fc_cv</code></pre>
+<pre><code>## # A fable: 2,144 x 6 [1Q]
+## # Key:     .id, .model [268]
+##      .id .model Quarter          Beer .mean     h
+##    &lt;int&gt; &lt;chr&gt;    &lt;qtr&gt;        &lt;dist&gt; &lt;dbl&gt; &lt;int&gt;
+##  1     1 Drift  1994 Q1  N(522, 5587)  522.     1
+##  2     1 Drift  1994 Q2 N(532, 12771)  532.     2
+##  3     1 Drift  1994 Q3 N(542, 21550)  542.     3
+##  4     1 Drift  1994 Q4 N(551, 31927)  551.     4
+##  5     1 Drift  1995 Q1 N(561, 43899)  561.     5
+##  6     1 Drift  1995 Q2 N(571, 57468)  571.     6
+##  7     1 Drift  1995 Q3 N(581, 72633)  581      7
+##  8     1 Drift  1995 Q4 N(591, 89394)  591.     8
+##  9     1 Mean   1994 Q1  N(448, 2540)  448.     1
+## 10     1 Mean   1994 Q2  N(448, 2540)  448.     2
+## # ... with 2,134 more rows</code></pre>
+<div id="inspection-of-the-results-of-step-3.2" class="section level4">
+<h4>Inspection of the results of step 3.2</h4>
+<p>Now we see that each forecast in the table has an associated <code>h</code> indicating its forecast horizon. This will be an important argument for the accuracy function (next step)</p>
+</div>
 </div>
 <div id="step-4-generate-cross-validated-accuracy-metrics-1" class="section level3">
 <h3>Step 4: generate cross-validated accuracy metrics</h3>
+<p>When used with a tsibble created with <code>stretch_tsibble()</code> that contains multiple training datasets, the accuracy function will <strong>compute the error metrics for each of the fitted models</strong> (for each combination of model + training dataset, in our case 267) and <strong>forecast horizont</strong>.</p>
+<p>Let us inspect the output:</p>
+<pre class="r"><code>beer_fc_cv %&gt;%
+  accuracy(recent_production, by = c(&quot;h&quot;, &quot;.model&quot;)) %&gt;%
+  select(h, .model, .type, MAE, RMSE, MAPE, MASE, RMSSE)</code></pre>
+<pre><code>## Warning: The future dataset is incomplete, incomplete out-of-sample data will be treated as missing. 
+## 8 observations are missing between 2010 Q3 and 2012 Q2</code></pre>
+<pre><code>## # A tibble: 32 x 8
+##        h .model         .type   MAE  RMSE  MAPE  MASE RMSSE
+##    &lt;int&gt; &lt;chr&gt;          &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+##  1     1 Drift          Test   54.9  64.5 12.4   4.05  4.00
+##  2     1 Mean           Test   37.4  43.6  8.59  2.76  2.70
+##  3     1 Naïve          Test   53.7  63.1 12.1   3.96  3.91
+##  4     1 Seasonal naïve Test   13.6  16.3  3.18  1.00  1.01
+##  5     2 Drift          Test   65.8  82.9 15.1   4.85  5.13
+##  6     2 Mean           Test   37.8  43.7  8.69  2.79  2.71
+##  7     2 Naïve          Test   63.4  79.3 14.6   4.67  4.92
+##  8     2 Seasonal naïve Test   13.6  16.3  3.18  1.00  1.01
+##  9     3 Drift          Test   56.3  67.1 12.9   4.15  4.16
+## 10     3 Mean           Test   36.7  42.2  8.40  2.70  2.61
+## # ... with 22 more rows</code></pre>
+<div id="inspection-of-results-of-step-4" class="section level4">
+<h4>Inspection of results of step 4:</h4>
+<p>Remember that in total 268 models were fit:
+* 67 Mean models (one per training dataset)
+* 67 Naïve models (one per training dataset)
+* 67 SNaïve models (one per training dataset)
+* 67 Drift models (one per training dataset)</p>
+<p>For each forecast horizont and for each specific model, we obtain the average error metric of all of the 67 models of that specific type we had fitted (one per training dataset). Lets think about a specific row:</p>
+<ul>
+<li>for <code>h</code> = 1 and <code>.model</code> = Drift, the error metrics for each of the 67 models Drift models that were created (one per training dataset) with a forecast horizon of 1 were computed and then averaged. The result of this process is what we see in row 1.</li>
+</ul>
+<p><strong>This is a much more robust process than assessing the performance of the model fitted to a single training dataset and tested on a single test dataset</strong>.</p>
+</div>
 </div>
 </div>
 </div>
