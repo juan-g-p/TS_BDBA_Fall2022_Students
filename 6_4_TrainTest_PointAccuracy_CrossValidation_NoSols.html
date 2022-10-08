@@ -2472,11 +2472,7 @@ google_2015_fc_cv</code></pre>
 <li>The row corresponding to <code>h = 4</code> and <code>model = Drift</code> contains the average error metrics (MAE, RMSE…) of each of the 233 Drift models that were fitted to each of the 233 training datasets when forecasting the value four steps ahead on their corresponding test datasets.</li>
 </ul>
 <p>This is a <strong>much more statistically robust method than just performing a single train-test split</strong>.</p>
-<p><strong>Good possible way to choose the best forecasting model</strong>: find the model with the smallest RMSE for the forecast horizon we wish to compute using time series cross-validation. Minimizing RMSE will lead to forecasts on the mean,</p>
-<ul>
-<li>For each training set a model has been fit (250 models) (identifid by its <code>.id</code>), 8 forecasts have been generated (1-step up to 8-steps forecasts). In total 250 * 8 = 2000 forecasts (number of rows in the table).</li>
-<li>The column h indicates the number of steps involved in the forecasts. It will allow us to group all forecasts with the same step using the argument <code>by</code> of the function <code>accuracy</code>.</li>
-</ul>
+<p><strong>Good possible way to choose the best forecasting model</strong>: find the model with the smallest RMSE for the forecast horizon we wish to compute using time series cross-validation. Minimizing RMSE will lead to forecasts on the mean.</p>
 <pre class="r"><code>summary_cv_h %&gt;% 
   ggplot(aes(x = h, y = RMSE, color = .model)) +
   geom_point()</code></pre>
@@ -2543,205 +2539,16 @@ beer_production</code></pre>
 ## # ... with 64 more rows</code></pre>
 </div>
 <div id="step-1.-create-the-set-of-training-datasets-using-stretch_tsibble-1" class="section level3">
-<h3>Step 1. Create the set of training datasets using <code>stretch_tsibble()</code>:</h3>
-<ul>
-<li>Since we are going to forecast up to 8-steps ahead into the future, the minimum size of our training datasets must be eight. We therefore set <code>.init</code> to 8.</li>
-<li>We want our training datasets to increase one data point at a time, so we set <code>.step</code> to 1. For complex models that take longer to fit, it may be impractical to have so many datasets and we may want to have a bigger step. Remember that a model will be fitted to each of your datasets, si if fitting your models is computationally expensive, you may not be interested in having so many datasets. For this example, since the models are simple enough, we may set step to 1.</li>
-</ul>
-<pre class="r"><code>beer_production_cv &lt;- beer_production %&gt;%
-  stretch_tsibble(.init = 8, .step = 1)
-
-# Inspect result
-beer_production_cv</code></pre>
-<pre><code>## # A tsibble: 2,747 x 3 [1Q]
-## # Key:       .id [67]
-##    Quarter  Beer   .id
-##      &lt;qtr&gt; &lt;dbl&gt; &lt;int&gt;
-##  1 1992 Q1   443     1
-##  2 1992 Q2   410     1
-##  3 1992 Q3   420     1
-##  4 1992 Q4   532     1
-##  5 1993 Q1   433     1
-##  6 1993 Q2   421     1
-##  7 1993 Q3   410     1
-##  8 1993 Q4   512     1
-##  9 1992 Q1   443     2
-## 10 1992 Q2   410     2
-## # ... with 2,737 more rows</code></pre>
-<div id="inspection-of-result-of-step-1" class="section level4">
-<h4>Inspection of result of step 1:</h4>
-<p>Inspecting <code>beer_production_cv</code> shows that it is a tsibble containing all our training datasets. Each training dataset has a distinct identifier in the column <code>.id</code>. Rows with <code>.id = 1</code> belong to the first training dataset, <code>id = 2</code> signals points belonging to the second dataset… etc… The number of datasets can be computed as follows:</p>
-<pre class="r"><code># Check the number of datasets created
-beer_production_cv %&gt;% pull(.id) %&gt;% max</code></pre>
-<pre><code>## [1] 67</code></pre>
-<p>We see that 67 training datasets were created. Each training dataset consists of multiple observations, ranging from 8 (first training dataset) to 74 observations (last dataset). The number of points per dataset can be inspected either counting rows in <code>beer_production_cv</code> (not very practical) or computing the size of the groups created by group_by(.id) as follows:</p>
-<pre class="r"><code># Check the size of each training dataset
-beer_production_cv %&gt;%
-  as_tibble() %&gt;% # Cast to a tibble to be able to do away with time index
-  group_by(.id) %&gt;%
-  summarize(
-    size = n()
-  )</code></pre>
-<pre><code>## # A tibble: 67 x 2
-##      .id  size
-##    &lt;int&gt; &lt;int&gt;
-##  1     1     8
-##  2     2     9
-##  3     3    10
-##  4     4    11
-##  5     5    12
-##  6     6    13
-##  7     7    14
-##  8     8    15
-##  9     9    16
-## 10    10    17
-## # ... with 57 more rows</code></pre>
-</div>
+<h3>Step 1. Create the set of training datasets using <code>stretch_tsibble()</code></h3>
 </div>
 <div id="step-2-fit-the-models" class="section level3">
 <h3>Step 2: Fit the models</h3>
-<p>Fit the models. In this case we chose to fit the four benchmark methods. More complex models might be fitted, but the workflow is the same:</p>
-<pre class="r"><code>beer_fit_cv &lt;- beer_production_cv %&gt;%
-  model(
-    `Naïve` = NAIVE(Beer),
-    `Seasonal naïve` = SNAIVE(Beer),
-    Mean = MEAN(Beer),
-    Drift = RW(Beer ~ drift())
-  )
-
-beer_fit_cv</code></pre>
-<pre><code>## # A mable: 67 x 5
-## # Key:     .id [67]
-##      .id   Naïve `Seasonal naïve`    Mean         Drift
-##    &lt;int&gt; &lt;model&gt;          &lt;model&gt; &lt;model&gt;       &lt;model&gt;
-##  1     1 &lt;NAIVE&gt;         &lt;SNAIVE&gt;  &lt;MEAN&gt; &lt;RW w/ drift&gt;
-##  2     2 &lt;NAIVE&gt;         &lt;SNAIVE&gt;  &lt;MEAN&gt; &lt;RW w/ drift&gt;
-##  3     3 &lt;NAIVE&gt;         &lt;SNAIVE&gt;  &lt;MEAN&gt; &lt;RW w/ drift&gt;
-##  4     4 &lt;NAIVE&gt;         &lt;SNAIVE&gt;  &lt;MEAN&gt; &lt;RW w/ drift&gt;
-##  5     5 &lt;NAIVE&gt;         &lt;SNAIVE&gt;  &lt;MEAN&gt; &lt;RW w/ drift&gt;
-##  6     6 &lt;NAIVE&gt;         &lt;SNAIVE&gt;  &lt;MEAN&gt; &lt;RW w/ drift&gt;
-##  7     7 &lt;NAIVE&gt;         &lt;SNAIVE&gt;  &lt;MEAN&gt; &lt;RW w/ drift&gt;
-##  8     8 &lt;NAIVE&gt;         &lt;SNAIVE&gt;  &lt;MEAN&gt; &lt;RW w/ drift&gt;
-##  9     9 &lt;NAIVE&gt;         &lt;SNAIVE&gt;  &lt;MEAN&gt; &lt;RW w/ drift&gt;
-## 10    10 &lt;NAIVE&gt;         &lt;SNAIVE&gt;  &lt;MEAN&gt; &lt;RW w/ drift&gt;
-## # ... with 57 more rows</code></pre>
-<div id="inspection-of-result-of-step-2" class="section level4">
-<h4>Inspection of result of step 2:</h4>
-<p>The result of step 2 is a <code>mable</code> of <code>model talbe</code>. It is essentially a table-shaped object containing all the models that have been fit. Let us inspect its dimensions:</p>
-<pre class="r"><code>dim(beer_fit_cv)</code></pre>
-<pre><code>## [1] 67  5</code></pre>
-<p>We see that it has 67 rows (one row per training dataset) and 5 columns: 1 for <code>.id</code> (identifier of the training dataset) and one column per model.
-* 4 models have been fit to each training dataset.
-* In total 4*67 = 268 models have been fit.</p>
 </div>
-</div>
-<div id="step-3.1-generate-the-forecasts" class="section level3">
-<h3>Step 3.1: generate the forecasts:</h3>
-<pre class="r"><code>beer_fc_cv &lt;- beer_fit_cv %&gt;%
-  forecast(h = 8)
-
-beer_fc_cv</code></pre>
-<pre><code>## # A fable: 2,144 x 5 [1Q]
-## # Key:     .id, .model [268]
-##      .id .model         Quarter          Beer .mean
-##    &lt;int&gt; &lt;chr&gt;            &lt;qtr&gt;        &lt;dist&gt; &lt;dbl&gt;
-##  1     1 Naïve          1994 Q1  N(512, 4886)   512
-##  2     1 Naïve          1994 Q2  N(512, 9772)   512
-##  3     1 Naïve          1994 Q3 N(512, 14658)   512
-##  4     1 Naïve          1994 Q4 N(512, 19545)   512
-##  5     1 Naïve          1995 Q1 N(512, 24431)   512
-##  6     1 Naïve          1995 Q2 N(512, 29317)   512
-##  7     1 Naïve          1995 Q3 N(512, 34203)   512
-##  8     1 Naïve          1995 Q4 N(512, 39089)   512
-##  9     1 Seasonal naïve 1994 Q1   N(433, 180)   433
-## 10     1 Seasonal naïve 1994 Q2   N(421, 180)   421
-## # ... with 2,134 more rows</code></pre>
-<div id="inspection-of-result-of-step-3.1" class="section level4">
-<h4>Inspection of result of step 3.1:</h4>
-<p>The output of step three is a <code>fable</code> or <code>forecasts table</code>.</p>
-<ul>
-<li>Each row corresponds to a specific forecast horizon, with a given model fit to a specific training dataset signaled by the row <code>.id</code></li>
-<li>For each compination of training dataset (<code>.id</code>) and <code>.model</code>, 8 forecast have been generated, ranging from a one-step ahead to an 8-steps ahead forecast.</li>
-<li>In total we have generated 67 (67 training datasets) * 4 (4 models) * 8 (8 forecasts) = 2144 forecasts. We can confirm this counting the nomber of roews of the result of step 3:</li>
-</ul>
-<pre class="r"><code>nrow(beer_fit_cv)</code></pre>
-<pre><code>## [1] 67</code></pre>
-</div>
-</div>
-<div id="step-3.2-only-for-multti-step-forecasts" class="section level3">
-<h3>Step 3.2: (only for multti-step forecasts)</h3>
-<p>Since we have multi-step forecasts, we want to add a column to the forecasts table that indicates the forecast horizon (h) of each forecast. We can achieve this using group_by.</p>
-<ul>
-<li>We want h to be reset every time the training dataset or the model changes, so we will group_by(.id, .model)</li>
-<li>as_fable() is used at the end to ensure that after performing a group_by and creating a new column, the result will still be a forecast table.
-<ul>
-<li><code>response</code> indicates the variable we are forecasting</li>
-<li><code>distribution</code> indicates were the column storing the forecast distributions of each forecast. The name is set to be the same as in the original output of step 3.1.</li>
-</ul></li>
-</ul>
-<pre class="r"><code>beer_fc_cv &lt;- beer_fc_cv %&gt;%
-  group_by(.id, .model) %&gt;%
-  mutate(h = row_number()) %&gt;%
-  ungroup() %&gt;%
-  as_fable(response = &quot;Beer&quot;, distribution = Beer)
-
-beer_fc_cv</code></pre>
-<pre><code>## # A fable: 2,144 x 6 [1Q]
-## # Key:     .id, .model [268]
-##      .id .model Quarter          Beer .mean     h
-##    &lt;int&gt; &lt;chr&gt;    &lt;qtr&gt;        &lt;dist&gt; &lt;dbl&gt; &lt;int&gt;
-##  1     1 Drift  1994 Q1  N(522, 5587)  522.     1
-##  2     1 Drift  1994 Q2 N(532, 12771)  532.     2
-##  3     1 Drift  1994 Q3 N(542, 21550)  542.     3
-##  4     1 Drift  1994 Q4 N(551, 31927)  551.     4
-##  5     1 Drift  1995 Q1 N(561, 43899)  561.     5
-##  6     1 Drift  1995 Q2 N(571, 57468)  571.     6
-##  7     1 Drift  1995 Q3 N(581, 72633)  581      7
-##  8     1 Drift  1995 Q4 N(591, 89394)  591.     8
-##  9     1 Mean   1994 Q1  N(448, 2540)  448.     1
-## 10     1 Mean   1994 Q2  N(448, 2540)  448.     2
-## # ... with 2,134 more rows</code></pre>
-<div id="inspection-of-the-results-of-step-3.2" class="section level4">
-<h4>Inspection of the results of step 3.2</h4>
-<p>Now we see that each forecast in the table has an associated <code>h</code> indicating its forecast horizon. This will be an important argument for the accuracy function (next step)</p>
-</div>
+<div id="step-3-generate-the-forecasts" class="section level3">
+<h3>Step 3: generate the forecasts</h3>
 </div>
 <div id="step-4-generate-cross-validated-accuracy-metrics-1" class="section level3">
 <h3>Step 4: generate cross-validated accuracy metrics</h3>
-<p>When used with a tsibble created with <code>stretch_tsibble()</code> that contains multiple training datasets, the accuracy function will <strong>compute the error metrics for each of the fitted models</strong> (for each combination of model + training dataset, in our case 267) and <strong>forecast horizont</strong>.</p>
-<p>Let us inspect the output:</p>
-<pre class="r"><code>beer_fc_cv %&gt;%
-  accuracy(recent_production, by = c(&quot;h&quot;, &quot;.model&quot;)) %&gt;%
-  select(h, .model, .type, MAE, RMSE, MAPE, MASE, RMSSE)</code></pre>
-<pre><code>## Warning: The future dataset is incomplete, incomplete out-of-sample data will be treated as missing. 
-## 8 observations are missing between 2010 Q3 and 2012 Q2</code></pre>
-<pre><code>## # A tibble: 32 x 8
-##        h .model         .type   MAE  RMSE  MAPE  MASE RMSSE
-##    &lt;int&gt; &lt;chr&gt;          &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
-##  1     1 Drift          Test   54.9  64.5 12.4   4.05  4.00
-##  2     1 Mean           Test   37.4  43.6  8.59  2.76  2.70
-##  3     1 Naïve          Test   53.7  63.1 12.1   3.96  3.91
-##  4     1 Seasonal naïve Test   13.6  16.3  3.18  1.00  1.01
-##  5     2 Drift          Test   65.8  82.9 15.1   4.85  5.13
-##  6     2 Mean           Test   37.8  43.7  8.69  2.79  2.71
-##  7     2 Naïve          Test   63.4  79.3 14.6   4.67  4.92
-##  8     2 Seasonal naïve Test   13.6  16.3  3.18  1.00  1.01
-##  9     3 Drift          Test   56.3  67.1 12.9   4.15  4.16
-## 10     3 Mean           Test   36.7  42.2  8.40  2.70  2.61
-## # ... with 22 more rows</code></pre>
-<div id="inspection-of-results-of-step-4" class="section level4">
-<h4>Inspection of results of step 4:</h4>
-<p>Remember that in total 268 models were fit:
-* 67 Mean models (one per training dataset)
-* 67 Naïve models (one per training dataset)
-* 67 SNaïve models (one per training dataset)
-* 67 Drift models (one per training dataset)</p>
-<p>For each forecast horizont and for each specific model, we obtain the average error metric of all of the 67 models of that specific type we had fitted (one per training dataset). Lets think about a specific row:</p>
-<ul>
-<li>for <code>h</code> = 1 and <code>.model</code> = Drift, the error metrics for each of the 67 models Drift models that were created (one per training dataset) with a forecast horizon of 1 were computed and then averaged. The result of this process is what we see in row 1.</li>
-</ul>
-<p><strong>This is a much more robust process than assessing the performance of the model fitted to a single training dataset and tested on a single test dataset</strong>.</p>
-</div>
 </div>
 </div>
 </div>
