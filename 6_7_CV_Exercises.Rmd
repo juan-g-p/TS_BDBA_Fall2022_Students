@@ -1,0 +1,88 @@
+---
+title: "6_7_Exercises_MidTerm_Review"
+author: ""
+date: ""
+output:
+  bookdown::html_document2:
+    number_sections: no
+    toc: true
+    toc_depth: 6
+    toc_float: false
+    toc_collapsed: false
+    self_contained: true
+    lib_dir: libs
+params:
+  print_sol: TRUE
+  hidden_notes: FALSE
+---
+
+```{r setup, warning=FALSE, echo=FALSE}
+library(fpp3)
+```
+
+## Exercise 1
+
+a.  Good forecast methods should have normally distributed residuals
+
+b.  A model with small residuals will give good forecasts
+
+c.  The best measure of forecast accuracy is MAPE.
+
+d.  If your model doesn't forecast well, you should make it more complicated
+
+e.  Always choose the model with the best forecast accuracy as measured on the test set
+
+## Exercise 2
+
+The dataset `aus_retail` contains retail data for different australian retail industries. Specifically the industries covered are:
+
+```{r}
+aus_retail %>% distinct(Industry)
+```
+
+We are interested in the industry *Takeaway food services*.
+
+1.  Compute the total turnover per month of all australian States combined. Plot the resulting series:
+
+2.  Create a training withholding the last four years as a test set
+
+3.  Obtain the optimal value of lambda suggested for a box-cox transformation. Use the whole time-series (not only the training dataset). Create a timeplot showing the result of applying that box-cox transsformation as a well as a log transformation.
+
+4.  Fit the following models to the training dataset and forecast four years into the future with every model:
+
+-   `decomposition_model` applying an STL decomposition and a log transformation. Use a drift model for the seasonally adjusted component and a seas. naïve model for the seasonal component.
+-   `decomposition_model` applying an STL decomposition and a box-cox transformation with the value of lambda suggested by the guerrero feature.Use a drift model for the seasonally adjusted component and a seas. naïve model for the seasonal component.
+-   `decomposition_model` applyting an STL decomposition with no transformation (technically incorrect since data is multiplicative). Use a drift model for the seasonally adjusted component and a seas. naïve model for the seasonal component.
+-   `naive` model
+-   `mean` model
+-   `seasonal naive` model
+-   `drift` model
+-   `simple exponential smoothing` model
+
+5.  Compute the accuracy metrics on:
+
+6.  Create a timeplot of the forecasts of the best performing model in terms of `MASE`. Three figures are requested:
+
+7.  Perform an analysis of the residuals of the model that performs best in terms of `MASE`:
+
+## Exercise 3
+
+`tourism` contains quarterly visitor nights (in thousands) from 1998 to 2017 for 76 regions of Australia.
+
+```{r, include=params$print_sol}
+tourism %>% distinct(Purpose)
+```
+
+1.  Extract data from the Gold Coast region using `filter()` and aggregate total overnight trips (sum over `Purpose`) using `summarise()`. Call this new dataset `gc_tourism`. Create a timeplot of `gc_tourism` as well as a correlogram.
+
+2.  Using `slice()` or `filter()`, create three training sets for this data excluding the last 1, 2 and 3 years.
+
+3.  Compute **one year** forecasts for each training set using the seasonal naïve method (`SNAIVE()`). Call these `gc_fc_1`, `gc_fc_2` and `gc_fc_3`, respectively. Generate one year forecasts for each model. Create a single timeplot with the time series (train+test sets) and the forecasts produced by the three models
+
+4.  Use `accuracy()` to compare the test set forecast accuracy(). Compute the accuracy on both the train and test datasets:
+
+-   Accuracy metrics based on the training dataset (on the residuals):
+
+-   Accuracy metrics based on the test dataset (forecast errors)
+
+5.  What would you do to assess the performance of the model in a more statitically robust manner?

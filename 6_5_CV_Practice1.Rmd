@@ -1,0 +1,126 @@
+---
+title: "6_5_CV_Practice_1"
+author: ""
+date: "29/4/2022"
+output:
+  bookdown::html_document2:
+    number_sections: no
+    toc: true
+    toc_depth: 6
+    toc_float: false
+    toc_collapsed: false
+    self_contained: true
+    lib_dir: libs
+params:
+  print_sol: TRUE
+  hidden_notes: FALSE
+---
+
+```{r, echo=FALSE, include=FALSE}
+library(kableExtra)
+```
+
+```{r}
+library(fpp3)
+```
+
+# Understanding cross-validation
+
+The task of this last asynchronous is related to understanding in-depth the concept of cross-validation.
+
+For this, you will perform several cross-validation examples and compute the results of the metrics in detail
+
+# Example 1: Algeria's exports
+
+```{r}
+alg_exports <- global_economy %>% filter(Country == "Algeria") %>% select(Year, Exports)
+
+autoplot(alg_exports)
+```
+
+```{r}
+
+```
+
+## Section 1. Taking a look at the time-plot of the data, which one of the following methods do you think coud work best for this data?
+
+* Mean model
+* Naïve model
+* Seasonal Naïve model
+* Drift model
+* Simple Exponential Smoothing
+
+## Section 2. Pick three models from the foregoing list and fit them to the data, performing cross validation to assess their performance:
+
+### S2. Step 1: Create the set of training datasets using `stretch_tsibble()`:
+
+Be sure to specify an initial size of the training dataset sufficient for a forecasting horizon of 8.
+
+```{r, include=params$print_sol}
+alg_exports_cv <- alg_exports %>%
+  stretch_tsibble(.init = 8, .step = 1)
+
+# Inspect result
+alg_exports_cv
+```
+#### Briefly explain the output of step 1
+
+* What type of object is obtained as a result of step 1? 
+
+* How many training datasets have been generated?
+
+* What are the dimensions of this object?
+
+* Compute a table that includes both the `.id` of the training dataset and the number of observations in each dataset.
+
+### S2. Step 2: Fit the models
+
+#### Briefly explain the output of step 2:
+
+* What type of object is obtained as a result of step 2?
+
+* What are the dimensions of this object?
+
+* How many models have been fitted in this step?
+
+### S2. Step 3: Generate the forecasts
+
+#### S2. Step 3.1: generate forecasts of up to 8 steps into the future.
+
+##### Briefly explain the output of step 3.1
+
+* What does each row represent?
+
+* How many forecasts have been generated?
+
+* What are the dimensions of the output and why?
+
+#### S2. Step 3.2: create a new column `h` signaling the number of steps into the future of each of the forecasts:
+
+### S2. Step 4: generate cross-validated accuracy metrics for each forecast horizon
+
+Retain only the MAE, RMSE, MAPE, MASE, RMSSE columns
+
+#### Briefly explain the output of step 4:
+
+* What does each row represent?
+
+* What are the dimensions of the output?
+
+* How do these metrics relate to the metrics of each of the models generated in the previous steps?
+
+## Section 3. Starting from the output of step 3.2 of section 2 (S2. Step 3.2)
+
+### S3. Step 1: Compute accuracy metrics for each combination of training dataset (`.id`), model (`.model`) and forecast horizon (`h`). 
+
+* Retain the columns for `.id, h, .model, .type, MAE, RMSE`
+
+* **What does the result represent?**
+
+* **Why do the columns for MAE and RMSE coincide**
+
+* **Have NAs been generated?**
+
+### S3. Step 2: starting from the output of S3. Step 1, average the results adequately over all the training datasets to produce an overall MAE and RMSE for every combination of model (`.model`) and forecast horizon (`h`)
+
+### S3. Step 3: compare the output of S3. Step2 to the output of S2. Step4

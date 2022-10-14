@@ -1,0 +1,94 @@
+---
+title: "ZZ_StockPrices"
+author: "Juan Garbayo"
+date: 
+output: 
+  html_document:
+    toc: true
+    toc_depth: 6
+    self_contained: true
+---
+
+# References
+
+1. Quantmod - [Link](https://www.quantmod.com/)
+2. Tidyquant - [Link](https://business-science.github.io/tidyquant/)
+3. Yahoo finance - Symbol search - [Link](https://finance.yahoo.com/lookup)
+
+# Introduction
+
+The `tidyquant` libary is essentially a wrapper to various `xts`, `zoo`, `quantmod`, `TTR` and `PerformanceAnaytics` package functions that integrates these with the tidy `tibble` format.
+
+It enables to use quantitative functions with the `tidyverse` functions and data structures. 
+
+See reference 2 for more information, documentation and examples.
+
+# Install and load packages
+
+```{r, eval=FALSE}
+install.packages("tidyquant")
+```
+
+```{r, error=FALSE, warning=FALSE, message = FALSE}
+library(tidyquant)
+library(tidyverse)
+library(feasts)
+```
+
+# Downloading prices and generating the tsibble
+
+Have a look at the list of symbols on reference 3.
+
+```{r}
+# 1. Select the asset you want to download
+# NOTE: check reference 3 to find the appropriate symbol for the asset.
+
+symbol = "^GSPC" # Example corresponding to S&P500
+
+# 2 Select start and end date for the analysis.
+start_date = "2017-05-01"
+end_date = as.Date(now())
+
+# 3. Download requested data
+prices <- tq_get(x = symbol,
+                 from = start_date,
+                 to = end_date,
+                 get = "stock.prices")
+
+# 4. Inspect results
+bind_rows(head(prices, 5), tail(prices, 5))
+```
+
+Once the data has been downloaded, we now proceed to convert it to a tsibble
+
+```{r}
+# Process tibble to generate a tsibble
+prices <- prices %>%
+
+  # 1. Generate new index
+  mutate(trading_day = row_number()) %>%
+  
+  # 2. Select variables of interest
+  select(symbol, trading_day, date, close) %>%
+   
+  # 3. Convert to tsibble
+  as_tsibble(index = trading_day, regular = TRUE)
+
+# 4. Inspect results
+bind_rows(head(prices, 5), tail(prices, 5))
+```
+
+```{r}
+autoplot(prices)
+```
+
+```{r}
+write_csv(prices, "SP500_Prices.csv")
+```
+
+# Analysis
+
+1. Compute the first order difference in closing prices and judge whether or not the series (see asynchronous session - stock prices exercise).
+
+* Does it have a trend?
+* Is similar to white noise?

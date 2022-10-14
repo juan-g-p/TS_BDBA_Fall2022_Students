@@ -1,0 +1,123 @@
+---
+title: "Efficient Market Hypothesis (Group assignment)"
+author: "Juan Garbayo - Time Series Analysis"
+date: "4/8/2022"
+output:
+  bookdown::html_document2:
+    number_sections: no
+    toc: true
+    toc_depth: 6
+    toc_float: false
+    toc_collapsed: false
+    self_contained: true
+    lib_dir: libs
+params:
+  run_snippet: FALSE
+  print_sol: FALSE
+  hidden_notes: FALSE
+---
+
+```{r}
+library(fpp3)
+library(patchwork)
+```
+
+# References
+
+[1] Fama, Eugene (1970). "Efficient Capital Markets: A Review of Theory and Empirical Work". Journal of Finance. 25 (2): 383–417. doi:10.2307/2325486. JSTOR 2325486.
+
+[2] Investopedia - Efficient Market Hypothesis [Link](https://www.investopedia.com/terms/e/efficientmarkethypothesis.asp)
+
+# The Efficient Market Hypothesis
+
+The goal of this assignment is to compare a prediction strategy based on the Efficiet Market Hypothesis (EMH) with the first of the non-trivial models you will work with: exponential smoothing.
+
+Essentially, the EMH states that stocks are accurately priced and reflect all available information. This makes it impossible to consistently beat the market by analysis.
+
+In his influential 1970 paper ([1]), Eugene Fama proposes three categories of efficiency that differ in the information considered reflected in the prices:
+
+1. *Weak-form of the EMH*: considers information contained in historical prices.
+2. *Semi-strong form of EMH*: considers information publicly available beyond historical prices.
+3. *Strong-form*: considers private (privileged) information.
+
+Here we are going to consider the weak-form of the EMH and work only with the information contained in historical prices.
+
+# Assignment
+
+The assignment consists in:
+
+### **1. Download historical data from a Stock Market Index and generate a dataset with that data.** (0.5 point)
+
+The idea is that you **download the data using the separate notebook provided**, **store it as a .csv** and **import it here.** You will work with two datasets:
+
+  * **Financial Times Stock Exchange:** tracks the 100 companies with the largest market capitalization on the London Stock Exchange.
+  
+The date ranges to be used are:
+
+  * **Initial date**: 7-th of May 2017
+  * **Final date**: the current date.
+  
+**Your final dataset must be an object of type `tsibble` with the following characteristics**:
+
+* key = symbol
+* index = trading_day
+
+```{r}
+```
+
+### **1.1 Create a time-plot of your data and briefly describe it (max 75 words)** (0.5 points)
+
+```{r}
+
+```
+
+### **2. Create three training datasets containing 80, 60 and 40% of your data** (0.5 points)
+
+```{r}
+
+```
+
+### **3. Fit both a Naïve model and a Simple Exponential Smooting model to each of these training datasets** (0.5 points)
+
+```{r}
+
+```
+
+### **4. Generate forecasts of 5 trading days for each of the trained models** (1 point)
+
+The result of this step should be a `fable` or forecast table. Name it `fc`
+
+Add a column `h` to `fc` indicating the forecast horizont of each forecast.
+
+* After adding that column, apply the following command: `as_fable(response = "close", distribution = close)`. This is to ensure that the output after performing these operations is still a fable.
+
+```{r}
+
+```
+### **5. For each combination of model, training dataset and forecast horizon compute the RMSE, MAE and MAPE. Store the result in a variable called `summary`** (1 point)
+
+```{r}
+
+```
+### **6. Use facet wrap to produce 3 graphs, one for each of the three error metrics used** (2 points)
+
+The graphs should depict the RMSE for each forecast horizon and for each combination of model and training dataset.
+
+* Does the training dataset have an effect on the errors?
+* Does one of the models outperform the other?
+
+```{r}
+
+```
+
+### **7. Evaluate the same metrics on the same models, but this time using cross validation** (2 points)
+
+The end-goal is that you produce the same final graph (facet_wrap graph on the error metrics), but this time only two lines per graph should be depicted (one line per model).
+
+The smallest training dataset shall contain 40% of the trading days. The trading datasets shall increase in steps of 1 trading day. You may later repeat this for .steps of 5 and note the difference in running time.
+
+```{r}
+
+```
+
+### **8. Present your conclusions** (1.5 points)
