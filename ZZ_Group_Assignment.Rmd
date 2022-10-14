@@ -94,11 +94,13 @@ Add a column `h` to `fc` indicating the forecast horizont of each forecast.
 ```{r}
 
 ```
+
 ### **5. For each combination of model, training dataset and forecast horizon compute the RMSE, MAE and MAPE. Store the result in a variable called `summary`** (1 point)
 
 ```{r}
 
 ```
+
 ### **6. Use facet wrap to produce 3 graphs, one for each of the three error metrics used** (2 points)
 
 The graphs should depict the RMSE for each forecast horizon and for each combination of model and training dataset.
