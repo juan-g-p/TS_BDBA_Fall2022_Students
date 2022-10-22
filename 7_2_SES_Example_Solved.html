@@ -1578,6 +1578,10 @@ fc %&gt;%
 ## 1 &quot;ETS(Exports ~ error(\&quot;A\&quot;) + trend(\&quot;N\&quot;) + season(\&quot;N\&quot;))&quot; alpha    0.886
 ## 2 &quot;ETS(Exports ~ error(\&quot;A\&quot;) + trend(\&quot;N\&quot;) + season(\&quot;N\&quot;))&quot; l[0]     7.41</code></pre>
 <p>Remember <strong>these values have been chosen by the library <code>fable</code> as part of the model fitting process</strong>. They are the values of the parameters that minimize the SSE.</p>
+<p>The fact that alpha is roughly 0.89 means that the most recent observation gets assigned a weight of 0.89. The remaining 0.11 percent is split in an exponentially decreasing manner across all other observations. We can see this on equation:</p>
+<p><span class="math display">\[
+\hat{y}_{T+1|T} = \alpha y_T + \alpha(1-\alpha) y_{T-1} + \alpha(1-\alpha)^2 y_{T-2}+ \cdots
+\]</span></p>
 </div>
 <div id="compute-the-standard-deviation-of-the-residuals-as-see-equation-in-html-format-of-the-notebook.-see-session-6_2-for-more-details." class="section level3">
 <h3>4. Compute the standard deviation of the residuals as (see equation in html format of the notebook). See session 6_2 for more details.</h3>
