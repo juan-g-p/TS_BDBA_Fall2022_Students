@@ -87,7 +87,7 @@ The date ranges to be used are:
 
 The result of this step should be a `fable` or forecast table. Name it `fc`
 
-Add a column `h` to `fc` indicating the forecast horizont of each forecast.
+Add a column `h` to `fc` indicating the forecast horizon of each forecast.
 
 * After adding that column, apply the following command: `as_fable(response = "close", distribution = close)`. This is to ensure that the output after performing these operations is still a fable.
 
