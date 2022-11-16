@@ -1,7 +1,7 @@
 ---
 title: "Efficient Market Hypothesis (Group assignment)"
-author: "Juan Garbayo - Time Series Analysis"
-date: "4/8/2022"
+author: "Juan Garbayo - Time Series"
+date: ""
 output:
   bookdown::html_document2:
     number_sections: no
@@ -48,9 +48,9 @@ The assignment consists in:
 
 ### **1. Download historical data from a Stock Market Index and generate a dataset with that data.** (0.5 point)
 
-The idea is that you **download the data using the separate notebook provided**, **store it as a .csv** and **import it here.** You will work with two datasets:
+The idea is that you **download the data using the separate notebook provided (ZZ_StockPrices.rmd)**, **store it as a .csv** and **import it here.** You will work with the following dataset:
 
-  * **Financial Times Stock Exchange:** tracks the 100 companies with the largest market capitalization on the London Stock Exchange.
+  * **Financial Times Stock Exchange:** tracks the 100 companies with the largest market capitalization on the London Stock Exchange. The associated symbol is" ^FTSE"
   
 The date ranges to be used are:
 
@@ -123,3 +123,9 @@ The smallest training dataset shall contain 40% of the trading days. The trading
 ```
 
 ### **8. Present your conclusions** (1.5 points)
+
+------
+
+
+
+------

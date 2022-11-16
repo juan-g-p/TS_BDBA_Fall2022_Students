@@ -1,0 +1,142 @@
+---
+title: "PPLE - Forecasting for TS - Assignment 2"
+self-contained: true
+format: html
+editor: visual
+params:
+  print_sol: false
+  hidden: false
+toc: true
+toc-location: left
+toc-depth: 6
+---
+
+```{r}
+#| echo: false
+#| warning: false
+library(fpp3)
+library(patchwork)
+```
+
+# The data
+
+The data consists in two quarterly time series: the quarterly unemployment rate and the quarterly inflation rate in Spain from 2002 to 2019
+
+```{r}
+sp_infl_unemp <- 
+  readr::read_csv("Quarterly.csv") %>% 
+  mutate(
+    Quarter = make_yearquarter(Year, Quarter)
+  ) %>% 
+  select(Quarter, qUR, qIR) %>% 
+  as_tsibble(index=Quarter)
+```
+
+## 1. Find an appropriate order of differencing to render the time series qIR stationary. Perform a test on the data to confirm the stationarity and interpret that test.
+
+NOTE: although the series only with first-order differences results in a series that passes the kpss test for stationarity, do not select this time series. Plot the ACF of this time series and you will see that it still has strong seasonality.
+
+```{r, include=params$print_sol}
+# Your code goes here
+```
+
+------------------------------------------------------------------------
+
+YOUR COMMENTS GO HERE (80 words max)
+
+------------------------------------------------------------------------
+
+## 2. Create the appropriate ACF and PACF graphs and identify potential model candidates for these graphs.
+
+```{r}
+# Your code goes here
+```
+
+------------------------------------------------------------------------
+
+YOUR COMMENTS GO HERE (80 words max)
+
+------------------------------------------------------------------------
+
+## 3. Fit the models prposed in step 2 along with an automatically fitted model with `stepwise=FALSE` and `approximate=FALSE` so that the search is as thorough as possible
+
+```{r, include=params$print_sol}
+# Your code goes here
+```
+
+## 4. Compare your models the resulting models in terms of:
+
+### 4.1 AIC (when applicable). Select one or two models based on AIC.
+
+```{r}
+# Your code goes here
+```
+
+------------------------------------------------------------------------
+
+Your answer goes here (60 words)
+
+------------------------------------------------------------------------
+
+### 4.2 Compare the models you selected in 3.1 in terms of their residuals
+
+```{r}
+# Your code goes here
+```
+
+------------------------------------------------------------------------
+
+Your answer goes here (max 150. words)
+
+------------------------------------------------------------------------
+
+## 5. Compare these models using cross validation with RMSE as the selecting metric. The smallest dataset shall leave out observations for 2015, 2016, 2017 and 2018. The forecasts we wish to make are forecasts of up to 1 year ahead. Compute the accuracy metrics for each model averaged over all forecasts horizons (that is, return only one RMSE average value per model type).
+
+```{r}
+# Your code goes here
+```
+
+------------------------------------------------------------------------
+
+Your answer goes here (max 100. words)
+
+------------------------------------------------------------------------
+
+## 6. Based on the results of 4 and 5, select one ARIMA model for forecasting. Produce forecasts up to 1 year ahead.
+
+```{r}
+# Your code goes here
+```
+
+------------------------------------------------------------------------
+
+Your answer goes here (max 100. words)
+
+------------------------------------------------------------------------
+
+## 7. Write the equation for the ARIMA model you obtained
+
+------------------------------------------------------------------------
+
+Provide a scanned page along with your solution to this notebook, both files together in a .zip file
+
+------------------------------------------------------------------------
+
+## 8. Introduce qUR as an external regressor in your model. Try the model specified below and add two ARIMA model you determined:
+
+```{r, eval=FALSE}
+# Example of model definitions:
+    model(
+            dynreg = ARIMA(qIR ~ qUR),
+            # Your model 1 = 
+            # Your model 2 =
+    )
+```
+
+## 9. Examine the p-value associated with qUR for all the the models you fitted. Any noticeable differences? Comment on this
+
+------------------------------------------------------------------------
+
+Your answer goes here
+
+------------------------------------------------------------------------
